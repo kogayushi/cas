@@ -33,6 +33,7 @@ import org.apereo.cas.support.geo.config.GoogleMapsGeoCodingConfiguration;
 import org.apereo.cas.web.config.CasCookieConfiguration;
 import org.apereo.cas.web.flow.config.CasCoreWebflowConfiguration;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,7 @@ public class DateTimeAuthenticationRequestRiskCalculatorTests {
         assertTrue(score.isHighestRisk());
     }
 
+    @Ignore
     @Test
     public void verifyTestWhenAuthnEventsFoundForUser() {
         final Authentication authentication = CoreAuthenticationTestUtils.getAuthentication("casuser");
