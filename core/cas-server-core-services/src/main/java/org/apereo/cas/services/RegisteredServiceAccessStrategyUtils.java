@@ -142,7 +142,8 @@ public final class RegisteredServiceAccessStrategyUtils {
                                                                 final AuthenticationResult context,
                                                                 final RegisteredService registeredService)
             throws UnauthorizedServiceException, PrincipalException {
-        ensurePrincipalAccessIsAllowedForService(serviceTicket.getService(), registeredService, context.getAuthentication());
+        ensurePrincipalAccessIsAllowedForService(serviceTicket.getService(), registeredService,
+                context.getAuthentication());
     }
 
     /**
@@ -155,13 +156,28 @@ public final class RegisteredServiceAccessStrategyUtils {
     public static void ensureServiceSsoAccessIsAllowed(final RegisteredService registeredService, final Service service,
                                                        final TicketGrantingTicket ticketGrantingTicket) {
 
+        ensureServiceSsoAccessIsAllowed(registeredService, service, true, ticketGrantingTicket);
+    }
+
+    /**
+     * Ensure service sso access is allowed.
+     *
+     * @param registeredService    the registered service
+     * @param service              the service
+     * @param notFromNewLogin      whether it's not from new login
+     * @param ticketGrantingTicket the ticket granting ticket
+     */
+    public static void ensureServiceSsoAccessIsAllowed(final RegisteredService registeredService, final Service service,
+                                                       final boolean notFromNewLogin,
+                                                       final TicketGrantingTicket ticketGrantingTicket) {
+
         if (!registeredService.getAccessStrategy().isServiceAccessAllowedForSso()) {
             LOGGER.debug("Service [{}] is configured to not use SSO", service.getId());
             if (ticketGrantingTicket.getProxiedBy() != null) {
                 LOGGER.warn("ServiceManagement: Service [{}] is not allowed to use SSO for proxying.", service.getId());
                 throw new UnauthorizedSsoServiceException();
             }
-            if (ticketGrantingTicket.getProxiedBy() == null && ticketGrantingTicket.getCountOfUses() > 0) {
+            if (ticketGrantingTicket.getProxiedBy() == null && notFromNewLogin && ticketGrantingTicket.getCountOfUses() > 0) {
                 LOGGER.warn("ServiceManagement: Service [{}] is not allowed to use SSO.", service.getId());
                 throw new UnauthorizedSsoServiceException();
             }
@@ -169,5 +185,4 @@ public final class RegisteredServiceAccessStrategyUtils {
         LOGGER.debug("Current authentication via ticket [{}] allows service [{}] to participate in the existing SSO session",
                 ticketGrantingTicket.getId(), service.getId());
     }
-
 }
